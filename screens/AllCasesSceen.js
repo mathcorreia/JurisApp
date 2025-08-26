@@ -1,7 +1,7 @@
 // screens/AllCasesScreen.js
 import React from 'react';
 import { View, Text, StyleSheet, SafeAreaView, Button } from 'react-native';
-import { COLORS } from '../constants/colors';
+import { COLORS } from '../constants/Colors';
 
 const AllCasesScreen = ({ navigation }) => {
   return (

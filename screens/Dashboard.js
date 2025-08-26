@@ -5,16 +5,14 @@ import { COLORS } from '../constants/Colors';
 import ProcessoCard from '../components/ProcessoCard';
 import MeetingsCalendar from '../components/MeetingsCalendar';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
-import { buscarProcessosPorAdvogado } from '../database/database'; // Importe a função
+import { buscarProcessosPorAdvogado } from '../database/database';
 
 const DashboardScreen = ({ route, navigation }) => {
-  // Recebe o usuário da navegação
-  const { user } = route.params; 
+  const { user } = route.params; // Recebe o usuário que veio da tela de login
   const [processos, setProcessos] = useState([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    // Função para carregar os processos do advogado
     const carregarProcessos = async () => {
       try {
         const processosDoUsuario = await buscarProcessosPorAdvogado(user.id);
@@ -33,8 +31,7 @@ const DashboardScreen = ({ route, navigation }) => {
     <SafeAreaView style={styles.safeArea}>
       <ScrollView style={styles.container}>
         <View style={styles.header}>
-          {/* Exibe o nome do usuário logado */}
-          <Text style={styles.greeting}>Olá, Dr. {user.nome}</Text>
+          <Text style={styles.greeting}>Olá, Dr(a). {user.nome}</Text>
           <TouchableOpacity>
              <MaterialCommunityIcons name="account-circle-outline" size={32} color={COLORS.textLight} />
           </TouchableOpacity>
@@ -56,11 +53,6 @@ const DashboardScreen = ({ route, navigation }) => {
           </TouchableOpacity>
         </View>
         
-        {/* Seções de atalhos e reuniões permanecem as mesmas */}
-        <View style={styles.section}>
-          <Text style={styles.sectionTitle}>MEUS ATALHOS</Text>
-          {/* ... */}
-        </View>
         <View style={styles.section}>
           <Text style={styles.sectionTitle}>MINHAS REUNIÕES</Text>
           <MeetingsCalendar />
@@ -70,7 +62,6 @@ const DashboardScreen = ({ route, navigation }) => {
   );
 };
 
-// Adicione um estilo para o texto de "nenhum processo"
 const styles = StyleSheet.create({
   safeArea: { flex: 1, backgroundColor: COLORS.primaryDark },
   container: { flex: 1, padding: 20 },
@@ -114,8 +105,8 @@ const styles = StyleSheet.create({
     color: COLORS.textSecondary,
     textAlign: 'center',
     marginVertical: 20,
+    fontSize: 16,
   },
-  // ...outros estilos que você já tem
 });
 
 export default DashboardScreen;

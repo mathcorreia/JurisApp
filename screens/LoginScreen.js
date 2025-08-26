@@ -2,13 +2,12 @@
 import React, { useState } from 'react';
 import { View, Text, TextInput, TouchableOpacity, StyleSheet, SafeAreaView, StatusBar, Alert } from 'react-native';
 import { COLORS } from '../constants/Colors';
-import { buscarAdvogado, adicionarAdvogado } from '../database/database'; // Importe as funções do banco
+import { buscarAdvogado, adicionarAdvogado } from '../database/database';
 
 const LoginScreen = ({ navigation }) => {
   const [email, setEmail] = useState('');
   const [senha, setSenha] = useState('');
   
-  // Função para lidar com o login
   const handleLogin = async () => {
     if (!email || !senha) {
       Alert.alert('Erro', 'Por favor, preencha e-mail e senha.');
@@ -23,16 +22,19 @@ const LoginScreen = ({ navigation }) => {
         Alert.alert('Erro de Login', 'E-mail ou senha incorretos.');
       }
     } catch (error) {
-      console.error('Falha no login:', error);
       Alert.alert('Erro', 'Ocorreu um erro ao tentar fazer login.');
     }
   };
 
-  // Função para registrar um novo usuário (exemplo simples)
   const handleSignUp = async () => {
-    // Em um app real, você teria uma tela de registro separada com mais campos
+    // Para simplificar, usamos os mesmos campos. Um app real teria uma tela de cadastro.
+    if (!email || !senha) {
+        Alert.alert('Erro', 'Preencha e-mail e senha para se cadastrar.');
+        return;
+    }
     try {
-      await adicionarAdvogado('Novo Advogado', email, senha);
+      // Usamos o email como nome padrão no cadastro rápido
+      await adicionarAdvogado(email.split('@')[0], email, senha);
       Alert.alert('Sucesso', 'Usuário registrado! Faça o login para continuar.');
     } catch (error) {
         if (error.message.includes('UNIQUE constraint failed')) {
@@ -47,7 +49,6 @@ const LoginScreen = ({ navigation }) => {
     <SafeAreaView style={styles.container}>
       <StatusBar barStyle="light-content" />
       <View style={styles.header}>
-        {/* Título JURISAPP centralizado */}
         <Text style={styles.logo}>JURISAPP</Text>
         <Text style={styles.title}>LOGIN</Text>
       </View>
@@ -86,7 +87,6 @@ const LoginScreen = ({ navigation }) => {
   );
 };
 
-// Estilos atualizados com o título centralizado
 const styles = StyleSheet.create({
   container: {
     flex: 1,
@@ -95,7 +95,7 @@ const styles = StyleSheet.create({
   header: {
     flex: 1,
     justifyContent: 'center',
-    alignItems: 'center', // Centraliza o conteúdo do header
+    alignItems: 'center', // Centraliza o conteúdo
     paddingHorizontal: 40,
   },
   logo: {
@@ -112,7 +112,7 @@ const styles = StyleSheet.create({
   },
   form: {
     flex: 2,
-    backgroundColor: 'white', // Usando uma cor mais neutra para o formulário
+    backgroundColor: 'white',
     borderTopLeftRadius: 50,
     borderTopRightRadius: 50,
     paddingHorizontal: 40,
