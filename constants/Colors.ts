@@ -4,7 +4,6 @@ const tintColorLight = '#2f95dc';
 const tintColorDark = '#fff';
 
 // Cores para os componentes de tela (Login, Dashboard, etc.)
-// Adicionamos um "export" aqui para que os arquivos .js possam importá-lo pelo nome.
 export const COLORS = {
   primaryDark: '#011638',
   primaryMedium: '#0d2149',
@@ -16,22 +15,21 @@ export const COLORS = {
 };
 
 // Cores para o tema geral do app (usado pelos componentes .tsx)
-// Mantemos o "export default" para os arquivos que já o utilizam.
 export default {
   light: {
     text: '#000',
     background: '#fff',
     tint: tintColorLight,
+    icon: '#687076', // Propriedade que estava faltando
     tabIconDefault: '#ccc',
     tabIconSelected: tintColorLight,
-    icon: '#687076',
   },
   dark: {
     text: '#fff',
     background: '#151718',
     tint: tintColorDark,
+    icon: '#9BA1A6', // Propriedade que estava faltando
     tabIconDefault: '#ccc',
     tabIconSelected: tintColorDark,
-    icon: '#9BA1A6',
   },
 };

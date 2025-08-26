@@ -1,40 +1,67 @@
 // screens/LoginScreen.js
 import React, { useState } from 'react';
-import { View, Text, TextInput, TouchableOpacity, StyleSheet, SafeAreaView, StatusBar } from 'react-native';
-import { COLORS } from '../constants/colors';
-// Importe o Svg se você tiver um arquivo wave-background.svg
-// import Svg, { Path } from 'react-native-svg';
+import { View, Text, TextInput, TouchableOpacity, StyleSheet, SafeAreaView, StatusBar, Alert } from 'react-native';
+import { COLORS } from '../constants/Colors';
+import { buscarAdvogado, adicionarAdvogado } from '../database/database'; // Importe as funções do banco
 
 const LoginScreen = ({ navigation }) => {
-  const [usuario, setUsuario] = useState('');
+  const [email, setEmail] = useState('');
   const [senha, setSenha] = useState('');
+  
+  // Função para lidar com o login
+  const handleLogin = async () => {
+    if (!email || !senha) {
+      Alert.alert('Erro', 'Por favor, preencha e-mail e senha.');
+      return;
+    }
+    try {
+      const advogado = await buscarAdvogado(email, senha);
+      if (advogado) {
+        // Navega para a tela principal, passando os dados do usuário
+        navigation.replace('MainApp', { screen: 'Dashboard', params: { user: advogado } });
+      } else {
+        Alert.alert('Erro de Login', 'E-mail ou senha incorretos.');
+      }
+    } catch (error) {
+      console.error('Falha no login:', error);
+      Alert.alert('Erro', 'Ocorreu um erro ao tentar fazer login.');
+    }
+  };
 
-  const handleLogin = () => {
-    // A lógica de autenticação real viria aqui
-    // Por enquanto, apenas navegamos para o Dashboard
-    navigation.replace('MainApp');
+  // Função para registrar um novo usuário (exemplo simples)
+  const handleSignUp = async () => {
+    // Em um app real, você teria uma tela de registro separada com mais campos
+    try {
+      await adicionarAdvogado('Novo Advogado', email, senha);
+      Alert.alert('Sucesso', 'Usuário registrado! Faça o login para continuar.');
+    } catch (error) {
+        if (error.message.includes('UNIQUE constraint failed')) {
+            Alert.alert('Erro', 'Este e-mail já está cadastrado.');
+        } else {
+            Alert.alert('Erro', 'Não foi possível registrar o usuário.');
+        }
+    }
   };
 
   return (
     <SafeAreaView style={styles.container}>
       <StatusBar barStyle="light-content" />
-      {/* Para a onda, a melhor abordagem é usar um SVG.
-        Coloque o componente SVG aqui com position: 'absolute'
-        Exemplo: <WaveBackground style={styles.wave} />
-      */}
       <View style={styles.header}>
+        {/* Título JURISAPP centralizado */}
         <Text style={styles.logo}>JURISAPP</Text>
         <Text style={styles.title}>LOGIN</Text>
       </View>
 
       <View style={styles.form}>
-        <Text style={styles.label}>USUÁRIO</Text>
+        <Text style={styles.label}>E-MAIL</Text>
         <TextInput
           style={styles.input}
-          value={usuario}
-          onChangeText={setUsuario}
-          placeholder="Digite seu usuário"
+          value={email}
+          onChangeText={setEmail}
+          placeholder="Digite seu e-mail"
           placeholderTextColor={COLORS.textSecondary}
+          keyboardType="email-address"
+          autoCapitalize="none"
         />
         <Text style={styles.label}>SENHA</Text>
         <TextInput
@@ -51,11 +78,15 @@ const LoginScreen = ({ navigation }) => {
         <TouchableOpacity style={styles.button} onPress={handleLogin}>
           <Text style={styles.buttonText}>ENTRAR</Text>
         </TouchableOpacity>
+        <TouchableOpacity style={styles.signUpButton} onPress={handleSignUp}>
+          <Text style={styles.signUpText}>Não tem uma conta? Cadastre-se</Text>
+        </TouchableOpacity>
       </View>
     </SafeAreaView>
   );
 };
 
+// Estilos atualizados com o título centralizado
 const styles = StyleSheet.create({
   container: {
     flex: 1,
@@ -64,6 +95,7 @@ const styles = StyleSheet.create({
   header: {
     flex: 1,
     justifyContent: 'center',
+    alignItems: 'center', // Centraliza o conteúdo do header
     paddingHorizontal: 40,
   },
   logo: {
@@ -80,7 +112,7 @@ const styles = StyleSheet.create({
   },
   form: {
     flex: 2,
-    backgroundColor: COLORS.backgroundLight,
+    backgroundColor: 'white', // Usando uma cor mais neutra para o formulário
     borderTopLeftRadius: 50,
     borderTopRightRadius: 50,
     paddingHorizontal: 40,
@@ -104,6 +136,7 @@ const styles = StyleSheet.create({
   forgotPassword: {
     color: COLORS.primaryDark,
     fontSize: 14,
+    textAlign: 'right',
     marginBottom: 30,
   },
   button: {
@@ -116,6 +149,14 @@ const styles = StyleSheet.create({
     color: COLORS.textLight,
     fontSize: 18,
     fontWeight: 'bold',
+  },
+  signUpButton: {
+    marginTop: 20,
+    alignItems: 'center',
+  },
+  signUpText: {
+    color: COLORS.primaryDark,
+    fontSize: 14,
   },
 });
 

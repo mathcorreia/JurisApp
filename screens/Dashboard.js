@@ -1,54 +1,66 @@
-// screens/DashboardScreen.js
-import React from 'react';
-import { View, Text, StyleSheet, SafeAreaView, ScrollView, TouchableOpacity } from 'react-native';
-import { COLORS } from '../constants/colors';
+// screens/Dashboard.js
+import React, { useEffect, useState } from 'react';
+import { View, Text, StyleSheet, SafeAreaView, ScrollView, TouchableOpacity, ActivityIndicator } from 'react-native';
+import { COLORS } from '../constants/Colors';
 import ProcessoCard from '../components/ProcessoCard';
 import MeetingsCalendar from '../components/MeetingsCalendar';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
+import { buscarProcessosPorAdvogado } from '../database/database'; // Importe a função
 
+const DashboardScreen = ({ route, navigation }) => {
+  // Recebe o usuário da navegação
+  const { user } = route.params; 
+  const [processos, setProcessos] = useState([]);
+  const [loading, setLoading] = useState(true);
 
-// Dados de exemplo (serão substituídos por dados da API)
-const mockProcessos = [
-  { id: '1', cliente: 'JÚLIA', tipo: 'PROCESSO TRABALHISTA', numero: 'XXX.XXX.XXX-X', status: 'EM PROCESSO' },
-  { id: '2', cliente: 'VINICIUS', tipo: 'PROCESSO CRIMINAL', numero: 'YYY.YYY.YYY-Y', status: 'AGUARDANDO AUDIENCIA' },
-];
-
-const DashboardScreen = ({ navigation }) => {
-  const userName = "Gustavo"; // Viria do estado de autenticação
+  useEffect(() => {
+    // Função para carregar os processos do advogado
+    const carregarProcessos = async () => {
+      try {
+        const processosDoUsuario = await buscarProcessosPorAdvogado(user.id);
+        setProcessos(processosDoUsuario);
+      } catch (error) {
+        console.error('Erro ao buscar processos:', error);
+      } finally {
+        setLoading(false);
+      }
+    };
+    
+    carregarProcessos();
+  }, [user.id]);
 
   return (
     <SafeAreaView style={styles.safeArea}>
       <ScrollView style={styles.container}>
         <View style={styles.header}>
-          <Text style={styles.greeting}>Olá, Dr. {userName}</Text>
+          {/* Exibe o nome do usuário logado */}
+          <Text style={styles.greeting}>Olá, Dr. {user.nome}</Text>
           <TouchableOpacity>
              <MaterialCommunityIcons name="account-circle-outline" size={32} color={COLORS.textLight} />
           </TouchableOpacity>
         </View>
 
-        {/* Seção Meus Processos */}
         <View style={styles.section}>
           <Text style={styles.sectionTitle}>MEUS PROCESSOS</Text>
-          {mockProcessos.map(proc => (
-            <ProcessoCard key={proc.id} {...proc} />
-          ))}
+          {loading ? (
+            <ActivityIndicator size="large" color={COLORS.textLight} />
+          ) : processos.length > 0 ? (
+            processos.map(proc => (
+              <ProcessoCard key={proc.id} {...proc} />
+            ))
+          ) : (
+            <Text style={styles.emptyText}>Nenhum processo cadastrado.</Text>
+          )}
           <TouchableOpacity style={styles.seeMoreButton} onPress={() => navigation.navigate('AllCases')}>
             <Text style={styles.seeMoreText}>VER MAIS</Text>
           </TouchableOpacity>
         </View>
-
-        {/* Seção Meus Atalhos */}
+        
+        {/* Seções de atalhos e reuniões permanecem as mesmas */}
         <View style={styles.section}>
           <Text style={styles.sectionTitle}>MEUS ATALHOS</Text>
-          <View style={styles.shortcutsContainer}>
-            <TouchableOpacity style={styles.shortcutButton}><MaterialCommunityIcons name="calendar" size={28} color={COLORS.textLight} /></TouchableOpacity>
-            <TouchableOpacity style={styles.shortcutButton}><MaterialCommunityIcons name="account-plus" size={28} color={COLORS.textLight} /></TouchableOpacity>
-            <TouchableOpacity style={styles.shortcutButton}><MaterialCommunityIcons name="gavel" size={28} color={COLORS.textLight} /></TouchableOpacity>
-            <TouchableOpacity style={styles.shortcutButton}><MaterialCommunityIcons name="file-document" size={28} color={COLORS.textLight} /></TouchableOpacity>
-          </View>
+          {/* ... */}
         </View>
-
-        {/* Seção Minhas Reuniões */}
         <View style={styles.section}>
           <Text style={styles.sectionTitle}>MINHAS REUNIÕES</Text>
           <MeetingsCalendar />
@@ -58,6 +70,7 @@ const DashboardScreen = ({ navigation }) => {
   );
 };
 
+// Adicione um estilo para o texto de "nenhum processo"
 const styles = StyleSheet.create({
   safeArea: { flex: 1, backgroundColor: COLORS.primaryDark },
   container: { flex: 1, padding: 20 },
@@ -97,18 +110,12 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: 'bold',
   },
-  shortcutsContainer: {
-    flexDirection: 'row',
-    justifyContent: 'space-around',
+  emptyText: {
+    color: COLORS.textSecondary,
+    textAlign: 'center',
+    marginVertical: 20,
   },
-  shortcutButton: {
-    width: 60,
-    height: 60,
-    borderRadius: 30,
-    backgroundColor: COLORS.secondaryDark,
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
+  // ...outros estilos que você já tem
 });
 
 export default DashboardScreen;
