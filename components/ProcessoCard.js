@@ -1,7 +1,7 @@
 // components/ProcessoCard.js
 import React from 'react';
 import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
-import { COLORS } from '../../constants/colors';
+import { COLORS } from './../constants/Colors.ts';
 
 const ProcessoCard = ({ cliente, tipo, numero, status }) => {
   return (

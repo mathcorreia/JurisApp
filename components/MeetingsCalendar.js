@@ -2,7 +2,7 @@
 import React from 'react';
 import { View, Text, StyleSheet } from 'react-native';
 import { Calendar, LocaleConfig } from 'react-native-calendars';
-import { COLORS } from '../../constants/colors';
+import { COLORS } from './../constants/Colors.ts';
 
 // Configuração para o idioma português
 LocaleConfig.locales['pt-br'] = {
